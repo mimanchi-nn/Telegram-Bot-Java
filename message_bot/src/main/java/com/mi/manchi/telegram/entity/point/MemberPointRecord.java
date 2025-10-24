@@ -34,12 +34,12 @@ public class MemberPointRecord extends Model<MemberPointRecord> {
 
 	/**
 	 * 创建时间
- 	 */
+	 */
 	private LocalDateTime createTime;
+
 	/**
 	 * 修改时间
 	 */
 	private LocalDateTime updateTime;
-
 
 }

@@ -5,4 +5,6 @@ import com.mi.manchi.telegram.entity.point.MemberPointRecord;
 
 public interface MemberPointRecordService extends IService<MemberPointRecord> {
 
+	MemberPointRecord selectRecord(Long groupId, Long memberId);
+
 }

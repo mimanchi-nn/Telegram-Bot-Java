@@ -12,30 +12,31 @@ import java.time.LocalDateTime;
 @TableName("member_point_log")
 public class MemberPointLog extends Model<MemberPointLog> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * 群ID
-     */
-    private Long groupId;
+	/**
+	 * 群ID
+	 */
+	private Long groupId;
 
-     /**
-     * 用户Id
-     */
-    private Long memberId;
+	/**
+	 * 用户Id
+	 */
+	private Long memberId;
 
-     /**
-     * 积分
-     */
-    private Integer point;
-    /**
-     * 动作
-     */
-    private Integer action;
-     /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
+	/**
+	 * 积分
+	 */
+	private Integer point;
 
+	/**
+	 * 动作
+	 */
+	private Integer action;
+
+	/**
+	 * 创建时间
+	 */
+	private LocalDateTime createTime;
 
 }

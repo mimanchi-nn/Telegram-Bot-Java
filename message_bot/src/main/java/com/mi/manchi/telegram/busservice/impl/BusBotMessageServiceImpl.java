@@ -53,7 +53,7 @@ public class BusBotMessageServiceImpl implements BusBotMessageService {
 			record.setUpdateTime(DateTimeUtils.get());
 			// 更新数据库
 			groupCheckInRecordService.updateById(record);
-			return buildCheckInSuccessMsg(todayCheckInTime, record.getTotalCheckInDays(),
+			return buildCheckInSuccessMsg(record.getTodayCheckInTime(), record.getTotalCheckInDays(),
 					record.getContinuousCheckInDays());
 		}
 		if (!ObjectUtils.isEmpty(todayCheckInTime) && !todayCheckInTime.toLocalDate().equals(yesterday)) {
@@ -65,7 +65,7 @@ public class BusBotMessageServiceImpl implements BusBotMessageService {
 			record.setUpdateTime(DateTimeUtils.get());
 			// 更新数据库
 			groupCheckInRecordService.updateById(record);
-			return buildCheckInSuccessMsg(todayCheckInTime, record.getTotalCheckInDays(),
+			return buildCheckInSuccessMsg(record.getTodayCheckInTime(), record.getTotalCheckInDays(),
 					record.getContinuousCheckInDays());
 		}
 		return null;

@@ -3,12 +3,14 @@ package com.mi.manchi.telegram.entity.point;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("group_point_limit")
-public class PointLimitConfig extends Model<MemberPointRecord> {
+public class PointLimitConfig extends Model<PointLimitConfig> {
 
 	@TableId(type = IdType.AUTO)
 	private Long id;

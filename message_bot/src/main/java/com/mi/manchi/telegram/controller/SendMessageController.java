@@ -28,7 +28,7 @@ public class SendMessageController {
 	}
 
 	@GetMapping("/deleteMessage")
-	public String deleteMessage(String chatId, Integer messageId){
+	public String deleteMessage(String chatId, Integer messageId) {
 		DeleteMessage deleteMsg = new DeleteMessage();
 		deleteMsg.setChatId(chatId);
 		deleteMsg.setMessageId(messageId);
@@ -40,9 +40,5 @@ public class SendMessageController {
 		}
 		return "success";
 	}
-
-
-
-
 
 }

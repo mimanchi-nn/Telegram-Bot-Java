@@ -2,10 +2,13 @@ package com.mi.manchi.telegram.busservice.impl;
 
 import com.mi.manchi.telegram.busservice.BusBotAdminService;
 import com.mi.manchi.telegram.busservice.BusBotMessageService;
+import com.mi.manchi.telegram.busservice.BusPointService;
 import com.mi.manchi.telegram.config.GroupMessageBot;
 import com.mi.manchi.telegram.entity.GroupManageInfo;
 import com.mi.manchi.telegram.entity.GroupMemberInfo;
+import com.mi.manchi.telegram.entity.MessageDTO;
 import com.mi.manchi.telegram.entity.MessageInfo;
+import com.mi.manchi.telegram.handler.CommandDispatcher;
 import com.mi.manchi.telegram.service.GroupManageInfoService;
 import com.mi.manchi.telegram.service.GroupMemberInfoService;
 import com.mi.manchi.telegram.service.MessageInfoService;
@@ -23,8 +26,6 @@ import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMember;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -39,9 +40,7 @@ public class BusBotAdminServiceImpl implements BusBotAdminService {
 
 	private final MessageInfoService messageInfoService;
 
-	private final BusBotMessageService busBotMessageService;
-
-	private final List<String> spamKeywords = Arrays.asList("广告", "兼职", "刷单", "二维码","全网最低");
+	private final CommandDispatcher commandDispatcher;
 
 	@Override
 	public void processBotJoinGroup(ChatMemberUpdated data) {
@@ -87,6 +86,7 @@ public class BusBotAdminServiceImpl implements BusBotAdminService {
 
 	@Override
 	public void processUserInvitedToGroup(ChatMemberUpdated data) {
+		log.info("parse user invited group:{}", data);
 		// 群信息（同上面逻辑）
 		Chat groupChat = data.getChat();
 		long groupId = groupChat.getId();
@@ -133,6 +133,7 @@ public class BusBotAdminServiceImpl implements BusBotAdminService {
 	public void parseInviteLinkCallback(CallbackQuery data) {
 		// 解析回调数据中的邀请链接信息
 		String callbackData = data.getData();
+		log.info("parse invite link:{}", data);
 		// 提取邀请链接中的参数（如：inviterId=123456&groupId=789012）
 		// 这里简单假设回调数据格式为：inviterId=123456&groupId=789012
 		String[] params = callbackData.split("&");
@@ -176,30 +177,11 @@ public class BusBotAdminServiceImpl implements BusBotAdminService {
 		messageInfo.setCreateTime(LocalDateTime.now());
 		messageInfo.setUpdateTime(LocalDateTime.now());
 		messageInfoService.save(messageInfo);
-		handSpamMessage(text, groupId, messageId);
-		handTriggerKeyWords(text, groupId, messageId);
 		handDelBotMessage(text, groupId, messageId);
-		handCheckIn(messageInfo);
-	}
+		MessageDTO data = new MessageDTO();
+		data.setMessageInfo(messageInfo);
+		commandDispatcher.dispatch(data);
 
-	private void handCheckIn(MessageInfo messageInfo) {
-		if (messageInfo.getContent().contains("爱懒懒")) {
-			String string = busBotMessageService.doCheckIn(messageInfo);
-			if (!ObjectUtils.isEmpty(string)) {
-				SendMessage message = new SendMessage();
-				message.setChatId(messageInfo.getGroupId().toString());
-				message.setText(string);
-				message.setReplyToMessageId(messageInfo.getMessageId()); // 回复触发消息
-
-				try {
-					Integer messageId = sendMessage(message);
-					scheduleWelcomeMsgDelete(messageInfo.getGroupId(), messageId);
-				}
-				catch (Exception e) {
-					log.error("send love quote failed：{}", e.getMessage(), e);
-				}
-			}
-		}
 	}
 
 	private void handDelBotMessage(String text, Long chatId, Integer messageId) {
@@ -213,63 +195,6 @@ public class BusBotAdminServiceImpl implements BusBotAdminService {
 			catch (TelegramApiException e) {
 				log.error("删除包含机器人名称的消息失败：", e);
 			}
-		}
-	}
-
-	private void handTriggerKeyWords(String text, Long chatId, Integer messageId) {
-		List<String> triggerKeywords = Arrays.asList("舔狗", "爱你", "宝", "想你", "懒懒的狗");
-		String lowerText = text.toLowerCase(); // 转为小写，实现忽略大小写匹配
-		for (String keyword : triggerKeywords) {
-			if (lowerText.contains(keyword)) {
-				sendLoveQuote(chatId, messageId); // 发送舔狗语录
-				return; // 只触发一次，避免重复发送
-			}
-		}
-
-	}
-
-	private void handSpamMessage(String text, Long chatId, Integer messageId) {
-		if (filterSpamMessage(text)) {
-			DeleteMessage deleteMsg = new DeleteMessage();
-			deleteMsg.setChatId(chatId.toString());
-			deleteMsg.setMessageId(messageId);
-			try {
-				deleteMessage(deleteMsg);
-			}
-			catch (TelegramApiException e) {
-				log.error("del spam msg failed：{}", e.getMessage(), e);
-			}
-		}
-
-	}
-
-	private Boolean filterSpamMessage(String text) {
-		return spamKeywords.stream().anyMatch(text::contains);
-	}
-
-	/**
-	 * 发送舔狗语录（对应 Go 的 sendLoveQuote 函数）
-	 */
-	private void sendLoveQuote(Long chatId, Integer replyToMessageId) {
-		// 示例：随机选择一条舔狗语录（实际可从数据库/配置文件加载）
-		List<String> loveQuotes = Arrays.asList("你昨晚在梦里叫错了我的名，没事，我今天就去改。", "那年你吐在操场上的口香糖，我捡起来嚼了三年。",
-				"今天晚上有点冷，刚刚偷电瓶的时候被发现了，本来想跑，结果警察说了一句老实点别动，我立刻就放弃了抵抗，因为我记得你说过你喜欢老实人。",
-				"你说你情头是一个人用的，朋友圈空白是因为你不发，情侣空间是和闺蜜开的，每次聊天你都说在忙，你真是一个上进的好女孩，我好喜欢你。", "你们都说她只是在吊着我，那她怎么不去吊别人？嗯我懂，她一定是喜欢我。",
-				"我偷偷的潜入了您的家里，想要拿走您的东西，我悄悄的走进卧室，您躺在床上睡觉，睫毛好长，窗帘没合好，调皮的月光洒到您身上，愣愣的看了半天，什么也没有拿，当小偷这么多年，我第一次被人偷了东西。",
-				"今天我头疼去医院检查，结果那个医生说我脑子坏了。 我一听就把他打了一顿， 我的脑子里都是你，他居然说我脑子坏了。他说你坏！我不允许别人说你一点不好。",
-				"今天在试卷上写满了你的名字，最后考了零分，果然爱你没有结果。", "我想戒掉熬夜和想你，好好做自己。", "你们都说她只是在吊着我，那她怎么不去吊别人？嗯我懂，她一定是喜欢我。", "汪汪汪!!!");
-		// 随机取一条
-		String quote = loveQuotes.get((int) (Math.random() * loveQuotes.size()));
-		SendMessage message = new SendMessage();
-		message.setChatId(chatId.toString());
-		message.setText(quote);
-		message.setReplyToMessageId(replyToMessageId); // 回复触发消息
-
-		try {
-			sendMessage(message);
-		}
-		catch (Exception e) {
-			log.error("send love quote failed：{}", e.getMessage(), e);
 		}
 	}
 
