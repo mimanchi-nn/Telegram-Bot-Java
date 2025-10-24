@@ -2,8 +2,9 @@ package com.mi.manchi.telegram.busservice.impl;
 
 import com.mi.manchi.telegram.busservice.BusPointService;
 import com.mi.manchi.telegram.entity.MessageInfo;
-import com.mi.manchi.telegram.entity.point.MemberPointRecord;
+
 import com.mi.manchi.telegram.entity.point.PointLimitConfig;
+import com.mi.manchi.telegram.service.MemberPointRecordService;
 import com.mi.manchi.telegram.service.PointLimitConfigService;
 import com.mi.manchi.telegram.utils.JacksonUtils;
 import lombok.RequiredArgsConstructor;
@@ -48,16 +49,6 @@ public class BusPointServiceImpl implements BusPointService {
         }
 
 
-        if (ObjectUtils.isEmpty(config)) {
-            PointLimitConfig pointLimitConfig = pointLimitConfigService.selectConfig(info.getGroupId());
-            if (pointLimitConfig != null) {
-                config = pointLimitConfig;
-                pointMap.put(info.getGroupId(), config);
-            }else {
-                return;
-            }
-        }
-
     }
 
     @Override
@@ -78,7 +69,7 @@ public class BusPointServiceImpl implements BusPointService {
     }
 
 
-    private void addPoint(Long memberId, String groupId, int valid) {
+    private void addPoint(Long memberId, Long groupId, int valid) {
 
     }
 }

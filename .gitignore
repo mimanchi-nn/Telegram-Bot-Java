@@ -3,3 +3,4 @@
 logs
 
 message_bot/src/main/resources/applica*.yml
+message_bot/target
