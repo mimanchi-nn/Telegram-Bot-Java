@@ -46,7 +46,7 @@ public class BusBotMessageServiceImpl implements BusBotMessageService {
 		}
 		if (!ObjectUtils.isEmpty(todayCheckInTime) && todayCheckInTime.toLocalDate().equals(yesterday)) {
 			// 昨日已签：连续签到+1
-			record.setTodayCheckInTime(todayCheckInTime);
+			record.setTodayCheckInTime(DateTimeUtils.get());
 			record.setContinuousCheckInDays(record.getContinuousCheckInDays() + 1);
 			record.setTotalCheckInDays(record.getTotalCheckInDays() + 1);
 			record.setLastCheckInDate(today);
@@ -58,7 +58,7 @@ public class BusBotMessageServiceImpl implements BusBotMessageService {
 		}
 		if (!ObjectUtils.isEmpty(todayCheckInTime) && !todayCheckInTime.toLocalDate().equals(yesterday)) {
 			// 昨日未签：连续签到重置为1
-			record.setTodayCheckInTime(todayCheckInTime);
+			record.setTodayCheckInTime(DateTimeUtils.get());
 			record.setContinuousCheckInDays(1);
 			record.setTotalCheckInDays(record.getTotalCheckInDays() + 1);
 			record.setLastCheckInDate(today);

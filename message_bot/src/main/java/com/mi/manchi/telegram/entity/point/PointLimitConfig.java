@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @TableName("group_point_limit")
-public class PointLimitConfig extends Model<UserDailyPoint> {
+public class PointLimitConfig extends Model<MemberPointRecord> {
 
 	@TableId(type = IdType.AUTO)
 	private Long id;

@@ -41,7 +41,7 @@ public class BusBotAdminServiceImpl implements BusBotAdminService {
 
 	private final BusBotMessageService busBotMessageService;
 
-	private final List<String> spamKeywords = Arrays.asList("广告", "兼职", "刷单", "二维码");
+	private final List<String> spamKeywords = Arrays.asList("广告", "兼职", "刷单", "二维码","全网最低");
 
 	@Override
 	public void processBotJoinGroup(ChatMemberUpdated data) {
