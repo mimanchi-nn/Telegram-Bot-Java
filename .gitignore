@@ -1,0 +1,5 @@
+.gitignore
+.idea
+logs
+
+message_bot/src/main/resources/applica*.yml
