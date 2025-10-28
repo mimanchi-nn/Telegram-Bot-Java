@@ -1,6 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:mysql://192.168.1.4:34521/telegram_bot?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: mysql2Moppo123#
-    driver-class-name: com.mysql.cj.jdbc.Driver
