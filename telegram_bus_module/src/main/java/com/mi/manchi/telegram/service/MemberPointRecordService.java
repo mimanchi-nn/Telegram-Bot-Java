@@ -1,0 +1,10 @@
+package com.mi.manchi.telegram.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.mi.manchi.telegram.model.entity.point.MemberPointRecord;
+
+public interface MemberPointRecordService extends IService<MemberPointRecord> {
+
+	MemberPointRecord selectRecord(Long groupId, Long memberId);
+
+}
