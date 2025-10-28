@@ -2,5 +2,5 @@
 .idea
 logs
 
-message_bot/src/main/resources/applica*.yml
+target
 message_bot/target
