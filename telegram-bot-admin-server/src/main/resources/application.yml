@@ -1,5 +1,8 @@
 server:
   port: 50000
+spring:
+  profiles:
+    active: @profiles.active@  # 当前激活配置，默认dev
 telegram:
   bot:
     token: 8280891588:AAGgWeooOqlvys-fSj_UU8DBBtwzU1ZaZHM
