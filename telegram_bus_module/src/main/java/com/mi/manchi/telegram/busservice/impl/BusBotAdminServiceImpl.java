@@ -178,6 +178,26 @@ public class BusBotAdminServiceImpl implements BusBotAdminService {
 		handDelBotMessage(text, groupId, messageId);
 		MessageDTO data = new MessageDTO();
 		data.setMessageInfo(messageInfo);
+		Message replyMessage = message.getReplyToMessage();
+
+		if (!ObjectUtils.isEmpty(replyMessage)) {
+			Long replyGroupId = replyMessage.getChatId(); // 被回复消息的群ID（与当前群ID一致）
+			Integer replyMessageId = replyMessage.getMessageId(); // 被回复消息的ID
+			User replySender = replyMessage.getFrom(); // 被回复消息的发送者
+			String replyText = replyMessage.getText(); // 被回复消息的内容
+			int replySendTime = replyMessage.getDate(); // 被回复消息的发送时间（秒）
+			Long replySenderId = replySender.getId(); // 被回复消息发送者的ID
+
+			MessageInfo replyInfo = new MessageInfo();
+			replyInfo.setGroupId(replyGroupId);
+			replyInfo.setMessageId(replyMessageId);
+			replyInfo.setMemberId(replySenderId);
+			replyInfo.setSendTime(replySendTime);
+			replyInfo.setContent(replyText);
+			replyInfo.setSendFirstName(replySender.getFirstName());
+			data.setReplyDetail(replyInfo);
+		}
+
 		commandDispatcher.dispatch(data);
 
 	}

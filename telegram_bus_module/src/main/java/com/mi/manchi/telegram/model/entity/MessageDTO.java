@@ -7,4 +7,6 @@ public class MessageDTO {
 
 	private MessageInfo messageInfo;
 
+	private MessageInfo replyDetail;
+
 }

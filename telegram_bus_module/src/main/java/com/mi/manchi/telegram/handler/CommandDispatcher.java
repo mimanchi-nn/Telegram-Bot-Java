@@ -1,19 +1,18 @@
 package com.mi.manchi.telegram.handler;
 
-import com.mi.manchi.telegram.config.GroupMessageBot;
 import com.mi.manchi.telegram.model.entity.MessageDTO;
 import com.mi.manchi.telegram.model.entity.MessageInfo;
-import com.mi.manchi.telegram.utils.SpringUtil;
+import com.mi.manchi.telegram.service.TelegramBotService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
-import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -24,8 +23,11 @@ public class CommandDispatcher {
 
 	private final List<MessageHandler> messageHandlers = new ArrayList<>();
 
+	private final TelegramBotService telegramBotService;
+
 	// 注入所有实现了 CommandHandler 接口的处理器（Spring 自动扫描）
-	public CommandDispatcher(List<MessageHandler> handlers) {
+	public CommandDispatcher(List<MessageHandler> handlers, TelegramBotService telegramBotService) {
+		this.telegramBotService = telegramBotService;
 		// 初始化映射：将每个处理器支持的指令与处理器绑定
 		for (MessageHandler handler : handlers) {
 			if (!ObjectUtils.isEmpty(handler.getSupportedCommands())) {
@@ -53,11 +55,15 @@ public class CommandDispatcher {
 			String command = text.split(" ")[0];
 			MessageHandler handler = commandMap.get(command);
 			if (handler != null) {
+				if (handler.isAdmin()
+						&& !telegramBotService.isAdmin(messageInfo.getGroupId(), messageInfo.getMemberId())) {
+					return;
+				}
 				SendMessage sendMessage = handler.handle(data);
 				if (!ObjectUtils.isEmpty(sendMessage)) {
-					Integer messageId = sendMessage(sendMessage);
+					Message message = telegramBotService.sendMessage(sendMessage);
 					if (handler.delete()) {
-						scheduleMsgDelete(messageInfo.getGroupId(), messageId);
+						telegramBotService.scheduleMsgDelete(messageInfo.getGroupId(), message.getMessageId());
 					}
 				}
 			}
@@ -66,55 +72,13 @@ public class CommandDispatcher {
 			messageHandlers.forEach(handler -> {
 				SendMessage sendMessage = handler.handle(data);
 				if (!ObjectUtils.isEmpty(sendMessage)) {
-					Integer messageId = sendMessage(sendMessage);
+					Message message = telegramBotService.sendMessage(sendMessage);
 					if (handler.delete()) {
-						scheduleMsgDelete(messageInfo.getGroupId(), messageId);
+						telegramBotService.scheduleMsgDelete(messageInfo.getGroupId(), message.getMessageId());
 					}
 				}
 			});
 		}
-	}
-
-	private void scheduleMsgDelete(Long groupId, Integer welcomeMsgId) {
-		// 定时任务调度器
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				DeleteMessage deleteMsg = new DeleteMessage();
-				deleteMsg.setChatId(groupId.toString());
-				deleteMsg.setMessageId(welcomeMsgId);
-
-				try {
-					deleteMessage(deleteMsg);
-					log.info("已定时删除群 [{}] 的消息，消息ID：{}", groupId, welcomeMsgId);
-				}
-				catch (TelegramApiException e) {
-					log.error("定时删除消息失败（群ID：{}，消息ID：{}）：", groupId, welcomeMsgId, e);
-				}
-				finally {
-					timer.cancel(); // 任务执行后关闭定时器，避免资源泄漏
-				}
-			}
-		}, 10000); // 延迟DELETE_DELAY毫秒后执行
-	}
-
-	private Integer sendMessage(BotApiMethodMessage message) {
-		GroupMessageBot bean = SpringUtil.getBean(GroupMessageBot.class);
-		try {
-			Message execute = bean.execute(message);
-			return execute.getMessageId();
-		}
-		catch (Exception e) {
-			log.error("send message failed：{}", e.getMessage(), e);
-		}
-		return null;
-	}
-
-	private void deleteMessage(DeleteMessage deleteMsg) throws TelegramApiException {
-		GroupMessageBot bean = SpringUtil.getBean(GroupMessageBot.class);
-		bean.execute(deleteMsg);
-
 	}
 
 }

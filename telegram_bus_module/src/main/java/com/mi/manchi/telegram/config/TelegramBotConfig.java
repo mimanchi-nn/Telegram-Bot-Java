@@ -1,8 +1,9 @@
 package com.mi.manchi.telegram.config;
 
-import com.mi.manchi.telegram.dispatch.GroupMessageService;
+import com.mi.manchi.telegram.dispatch.TelegramMessageListener;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -19,11 +20,11 @@ public class TelegramBotConfig {
 	@Value("${telegram.bot.username}")
 	private String botUsername;
 
-	private final GroupMessageService groupMessageService;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Bean
 	public GroupMessageBot groupMessageBot() throws TelegramApiException {
-		GroupMessageBot bot = new GroupMessageBot(botToken, botUsername, groupMessageService);
+		GroupMessageBot bot = new GroupMessageBot(botToken, botUsername, eventPublisher);
 
 		// 注册机器人到 TelegramBotsApi
 		TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);

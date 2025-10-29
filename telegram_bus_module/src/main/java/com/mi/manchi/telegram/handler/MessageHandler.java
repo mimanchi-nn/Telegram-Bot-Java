@@ -27,6 +27,10 @@ public interface MessageHandler {
 	 */
 	Boolean isAdmin();
 
+	/**
+	 * 是否删除发送的消息
+	 * @return true 如果需要删除，false 则不需要
+	 */
 	Boolean delete();
 
 }
