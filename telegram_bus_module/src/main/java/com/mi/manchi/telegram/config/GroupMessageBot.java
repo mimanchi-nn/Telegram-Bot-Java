@@ -1,6 +1,5 @@
 package com.mi.manchi.telegram.config;
 
-import com.mi.manchi.telegram.dispatch.TelegramMessageListener;
 import com.mi.manchi.telegram.model.event.TelegramMessageEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

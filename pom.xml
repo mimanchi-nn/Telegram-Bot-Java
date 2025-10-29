@@ -11,6 +11,7 @@
     <modules>
         <module>telegram-bot-admin-server</module>
         <module>telegram_bus_module</module>
+        <module>telegram-dependency</module>
     </modules>
 
     <properties>
@@ -19,6 +20,7 @@
         <revision>1.0-SNAPSHOT</revision>
 
         <spring-boot.version>2.5.4</spring-boot.version>
+        <spring-javaformat-checkstyle.version>0.0.25</spring-javaformat-checkstyle.version>
     </properties>
 
 
@@ -26,17 +28,17 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
-
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
-                <version>${spring-boot.version}</version>
+                <groupId>com.mi.manchi.telegram</groupId>
+                <artifactId>telegram-dependency</artifactId>
+                <version>${revision}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -45,7 +47,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -75,6 +76,20 @@
         </resources>
         <plugins>
             <plugin>
+                <groupId>io.spring.javaformat</groupId>
+                <artifactId>spring-javaformat-maven-plugin</artifactId>
+                <version>${spring-javaformat-checkstyle.version}</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <inherited>true</inherited>
+                        <goals>
+                            <goal>validate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-source-plugin</artifactId>
                 <executions>
                     <execution>
@@ -100,6 +115,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>

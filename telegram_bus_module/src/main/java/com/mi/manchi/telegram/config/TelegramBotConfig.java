@@ -1,6 +1,5 @@
 package com.mi.manchi.telegram.config;
 
-import com.mi.manchi.telegram.dispatch.TelegramMessageListener;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;

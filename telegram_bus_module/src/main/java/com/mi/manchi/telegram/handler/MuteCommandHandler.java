@@ -79,17 +79,17 @@ public class MuteCommandHandler implements MessageHandler {
 		}
 
 		switch (content) {
-			case "/mute 10s":
-				handleMute(info.getGroupId(), reply.getMemberId(), System.currentTimeMillis() / 1000 + 10);
-				break;
-			case "/mute 30s":
-				handleMute(info.getGroupId(), reply.getMemberId(), System.currentTimeMillis() / 1000 + 30);
-				break;
-			case "/unmute":
-				handleUnmute(info.getGroupId(), reply.getMemberId());
-				break;
-			default:
-				break;
+		case "/mute 10s":
+			handleMute(info.getGroupId(), reply.getMemberId(), System.currentTimeMillis() / 1000 + 10);
+			break;
+		case "/mute 30s":
+			handleMute(info.getGroupId(), reply.getMemberId(), System.currentTimeMillis() / 1000 + 30);
+			break;
+		case "/unmute":
+			handleUnmute(info.getGroupId(), reply.getMemberId());
+			break;
+		default:
+			break;
 		}
 		return null;
 	}
@@ -162,20 +162,20 @@ public class MuteCommandHandler implements MessageHandler {
 			// 计算秒数
 			long seconds;
 			switch (unit) {
-				case "s":
-					seconds = value;
-					break;
-				case "m":
-					seconds = value * 60;
-					break;
-				case "h":
-					seconds = value * 3600;
-					break;
-				case "d":
-					seconds = value * 86400;
-					break;
-				default:
-					return null;
+			case "s":
+				seconds = value;
+				break;
+			case "m":
+				seconds = value * 60;
+				break;
+			case "h":
+				seconds = value * 3600;
+				break;
+			case "d":
+				seconds = value * 86400;
+				break;
+			default:
+				return null;
 			}
 
 			// 校验最大时长

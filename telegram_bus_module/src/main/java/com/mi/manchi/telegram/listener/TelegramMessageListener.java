@@ -1,4 +1,4 @@
-package com.mi.manchi.telegram.dispatch;
+package com.mi.manchi.telegram.listener;
 
 import com.mi.manchi.telegram.busservice.BusBotAdminService;
 import com.mi.manchi.telegram.model.event.TelegramMessageEvent;
@@ -18,7 +18,7 @@ public class TelegramMessageListener {
 
 	@Async
 	@EventListener(TelegramMessageEvent.class)
-	public void process(TelegramMessageEvent event) {
+	public void messageDispatch(TelegramMessageEvent event) {
 		Update message = event.getMessage();
 		// 处理机器人被邀请信息
 		if (message.hasMyChatMember()) {
